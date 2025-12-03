@@ -1,0 +1,23 @@
+---
+title: "part2e"
+vignette: >
+  %\VignetteIndexEntry{part2e}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r include = FALSE}
+#| label: setup
+
+# For development: loads package from source
+if (requireNamespace("devtools", quietly = TRUE)) {
+  devtools::load_all()
+}
+
+# Load dependencies
+library(ggplot2)
+```

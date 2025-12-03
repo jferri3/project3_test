@@ -1,0 +1,125 @@
+---
+title: "part2e"
+vignette: >
+  %\VignetteIndexEntry{part2e}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r include = FALSE}
+#| label: setup
+
+# For development: loads package from source
+if (requireNamespace("devtools", quietly = TRUE)) {
+  devtools::load_all()
+}
+
+# Load dependencies
+library(ggplot2)
+```
+
+# set x and k values
+```{r}
+# define x values from 0 to 10
+x_values <- seq(0,10, by = 0.1)
+
+# values of k to demonstrate
+k_values <- c(1,3,5,7,9)
+```
+
+# demonstrate fn_cos() 
+```{r}
+# create emtpy df to store results
+cos_df <- data.frame()
+
+# loop over k values
+for (k in k_values) {
+  cos_df <- rbind(cos_df, data.frame(
+    x = x_values,
+    y = sapply(x_values, fn_cos, k=k),
+    k = factor(k)
+  ))
+}
+
+# Data frame for base R cos(x)
+cos_points <- data.frame(
+  x = x_values,
+  y = cos(x_values)
+)
+
+# Plot
+ggplot(cos_df, aes(x = x, y = y, color = k)) +
+  geom_line(size = 1) +  # fn_cos lines
+  geom_point(data = cos_points, aes(x = x, y = y), color = "black", shape = 4) +  # base cos(x) points
+  labs(title = "Approximation of cos(x) using series expansion",
+       y = "cos(x) approximation",
+       color = "k value") +
+  theme_minimal()
+```
+
+# demonstrate fn_cos() 
+```{r}
+# Create an empty data frame for fn_sin
+sin_df <- data.frame()
+
+for (k in k_values) {
+  sin_df <- rbind(sin_df, data.frame(
+    x = x_values,
+    y = sapply(x_values, fn_sin, k = k),
+    k = factor(k)
+  ))
+}
+
+# Data frame for base R sin(x)
+sin_points <- data.frame(
+  x = x_values,
+  y = sin(x_values)
+)
+
+# Plot
+ggplot(sin_df, aes(x = x, y = y, color = k)) +
+  geom_line(size = 1) +  # fn_sin lines
+  geom_point(data = sin_points, aes(x = x, y = y), color = "black", shape = 4) +  # base sin(x) points
+  labs(title = "Approximation of sin(x) using series expansion",
+       y = "sin(x) approximation",
+       color = "k value") +
+  theme_minimal()
+```
+# Demonstrate calculate_CI()
+with palmer penguins dataset!
+
+```{r}
+library(palmerpenguins)
+library(dplyr)
+
+# clean data - remove NAs
+
+penguins_clean <- penguins %>%
+  filter(!is.na(bill_length_mm))
+
+# Calculate CI by island
+ci_by_island <- penguins_clean %>%
+  group_by(island) %>%
+  summarize(
+    lower_bound = calculate_CI(bill_length_mm)[1],
+    upper_bound = calculate_CI(bill_length_mm)[2],
+    .groups = "drop"
+  )
+
+# View results
+ci_by_island 
+
+ggplot(ci_by_island, aes(x = island, y = (lower_bound + upper_bound)/2)) +
+  geom_point(size = 3) + 
+  geom_errorbar(aes(ymin = lower_bound, ymax = upper_bound), width = 0.2) +
+  labs(title = "95% Confidence Interval of Bill Length by Island",
+       y = "Bill length (mm)",
+       x = "Island") +
+  theme_minimal()
+
+```
+
